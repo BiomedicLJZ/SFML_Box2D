@@ -1,0 +1,12 @@
+{
+  "name" : "tema2",
+  "version-string" : "1.0.0",
+  "builtin-baseline" : "277733116c41c681b877bcfe16232e6b9e45bdcc",
+  "dependencies" : [ {
+    "name" : "box2d",
+    "version>=" : "2.4.1#3"
+  }, {
+    "name" : "sfml",
+    "version>=" : "2.6.0#19"
+  } ]
+}
