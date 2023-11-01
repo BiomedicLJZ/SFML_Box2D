@@ -63,7 +63,7 @@ int main() {
     b2DistanceJointDef jointDef;
     jointDef.Initialize(cube.getBody(), cube2.getBody(), cube.getBody()->GetWorldCenter(), cube2.getBody()->GetWorldCenter());
 
-    float frequencyHz = 60.0f;
+    float frequencyHz = 30.0f;
     float dampingRatio = 0.1f;
 
     b2LinearStiffness(jointDef.stiffness,jointDef.damping, frequencyHz, dampingRatio, jointDef.bodyA, jointDef.bodyB);
@@ -96,9 +96,6 @@ int main() {
 
             if (sf::Keyboard::isKeyPressed(sf::Keyboard::R)) {
                 cube.stop();
-            }
-
-            if(sf::Keyboard::isKeyPressed(sf::Keyboard::P)){
                 cube2.stop();
             }
 
