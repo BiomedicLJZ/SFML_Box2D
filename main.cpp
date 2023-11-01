@@ -58,6 +58,19 @@ int main() {
 
     Cube cube(world, 400, 300);
 
+    Cube cube2(world, 500, 300);
+
+    b2DistanceJointDef jointDef;
+    jointDef.Initialize(cube.getBody(), cube2.getBody(), cube.getBody()->GetWorldCenter(), cube2.getBody()->GetWorldCenter());
+
+    float frequencyHz = 60.0f;
+    float dampingRatio = 0.1f;
+
+    b2LinearStiffness(jointDef.stiffness,jointDef.damping, frequencyHz, dampingRatio, jointDef.bodyA, jointDef.bodyB);
+
+    world.CreateJoint(&jointDef);
+
+
     while (window.isOpen()) {
         sf::Event event{};
         while (window.pollEvent(event)) {
@@ -85,6 +98,10 @@ int main() {
                 cube.stop();
             }
 
+            if(sf::Keyboard::isKeyPressed(sf::Keyboard::P)){
+                cube2.stop();
+            }
+
             // The Z key event to close the window
             if (sf::Keyboard::isKeyPressed(sf::Keyboard::Z)) {
                 window.close();
@@ -94,9 +111,11 @@ int main() {
 
         world.Step(1 / 60.f, 8, 3);
         cube.update();
+        cube2.update();
 
         window.clear();
         cube.draw(window);
+        cube2.draw(window);
         window.display();
     }
     return 0;
