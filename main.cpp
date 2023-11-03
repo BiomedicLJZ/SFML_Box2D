@@ -5,10 +5,14 @@ constexpr float SCALE = 30.0f;
 
 class Cube {
 public:
-    Cube(b2World &world, float x, float y) {
+    Cube(b2World &world, float x, float y, bool dynamic = false) {
         b2BodyDef bodydef;
         bodydef.position.Set(x / SCALE, y / SCALE);
-        bodydef.type = b2_dynamicBody;
+        if (dynamic==true) {
+            bodydef.type = b2_dynamicBody;
+        } else {
+            bodydef.type = b2_staticBody;
+        }
         body = world.CreateBody(&bodydef);
 
         b2PolygonShape shape;
@@ -53,23 +57,21 @@ private:
 int main() {
     sf::RenderWindow window(sf::VideoMode(1000, 900), "Space Invaders v0.0.1!");
 
-    b2Vec2 gravity(0.0f, 0.0f);
+    b2Vec2 gravity(0.0f, 4.0f);
     b2World world(gravity);
 
-    Cube cube(world, 400, 300);
+    Cube cube(world, 400, 300,true);
 
-    Cube cube2(world, 500, 300);
+    Cube cube2(world, 500, 300, false);
 
-    b2DistanceJointDef jointDef;
-    jointDef.Initialize(cube.getBody(), cube2.getBody(), cube.getBody()->GetWorldCenter(), cube2.getBody()->GetWorldCenter());
+    b2PrismaticJointDef jointDef;
+    jointDef.Initialize(cube.getBody(), cube2.getBody(), cube.getBody()->GetWorldCenter(), b2Vec2(1.0f, 0.0f));
+    jointDef.lowerTranslation = -10.0f;
+    jointDef.upperTranslation = 10.0f;
+    jointDef.enableLimit = true;
 
-    float frequencyHz = 30.0f;
-    float dampingRatio = 0.1f;
-
-    b2LinearStiffness(jointDef.stiffness,jointDef.damping, frequencyHz, dampingRatio, jointDef.bodyA, jointDef.bodyB);
 
     world.CreateJoint(&jointDef);
-
 
     while (window.isOpen()) {
         sf::Event event{};

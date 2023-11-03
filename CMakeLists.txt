@@ -2,11 +2,6 @@ cmake_minimum_required(VERSION 3.26)
 project(Tema2)
 
 set(CMAKE_CXX_STANDARD 17)
-set(SFML_DIR "C:/Users/Lordleojz/.vcpkg-clion/vcpkg/packages/sfml_x64-windows/share/sfml")
-set(CMAKE_MAP_IMPORTED_CONFIG_MINSIZEREL MinSizeRel RelWithDebInfo Release Debug)
-set(CMAKE_MAP_IMPORTED_CONFIG_RELWITHDEBINFO RelWithDebInfo Release MinSizeRel Debug)
-set(CMAKE_MAP_IMPORTED_CONFIG_RELEASE Release RelWithDebInfo MinSizeRel Debug)
-
 
 add_executable(Tema2 main.cpp)
 
