@@ -5,7 +5,7 @@ constexpr float SCALE = 30.0f;
 
 class Cube {
 public:
-    Cube(b2World &world, float x, float y, int dynamic = 0) {
+    Cube(b2World &world, float x, float y, int dynamic = 0,float density = 1.0f) {
         b2BodyDef bodydef;
         bodydef.position.Set(x / SCALE, y / SCALE);
         switch (dynamic) {
@@ -26,7 +26,7 @@ public:
 
         b2FixtureDef fixturedef;
         fixturedef.shape = &shape;
-        fixturedef.density = 1.0f;
+        fixturedef.density = density;
         body->CreateFixture(&fixturedef);
 
         box.setSize(sf::Vector2f(10.f, 10.f));
@@ -70,7 +70,7 @@ int main() {
 
     Cube cube2(world, 500, 300, 1);
 
-    Cube cube3(world, 600, 400, 0);
+    Cube cube3(world, 600, 400, 1,100000.f);
 
     b2PrismaticJointDef jointDef;
     jointDef.Initialize(cube.getBody(), cube3.getBody(), cube3.getBody()->GetWorldCenter(), b2Vec2(1.0f, 0.0f));
@@ -85,8 +85,33 @@ int main() {
     jointDef2.enableLimit = true;
 
 
-    world.CreateJoint(&jointDef);
-    world.CreateJoint(&jointDef2);
+    Cube cube4(world, 650, 450, 1);
+
+    b2RevoluteJointDef jointDef3;
+
+    jointDef3.Initialize(cube4.getBody(), cube3.getBody(), cube3.getBody()->GetWorldCenter());
+    jointDef3.lowerAngle = -10.0f * b2_pi / 180.0f;
+    jointDef3.upperAngle = 10.0f * b2_pi / 180.0f;
+    jointDef3.enableLimit = false;
+    jointDef3.enableMotor = false;
+    jointDef3.maxMotorTorque = 1.0f;
+    jointDef3.motorSpeed = 1.0f;
+
+
+    b2PrismaticJoint* joint = (b2PrismaticJoint*)world.CreateJoint(&jointDef);
+    b2PrismaticJoint* joint2 = (b2PrismaticJoint*)world.CreateJoint(&jointDef2);
+    b2RevoluteJoint* joint3 = (b2RevoluteJoint*)world.CreateJoint(&jointDef3);
+
+    b2GearJointDef gearJointDef;
+
+    gearJointDef.bodyA = cube.getBody();
+    gearJointDef.bodyB = cube2.getBody();
+    gearJointDef.joint1 = joint;
+    gearJointDef.joint2 = joint2;
+    gearJointDef.ratio = 0.2f;
+
+    world.CreateJoint(&gearJointDef);
+
 
     while (window.isOpen()) {
         sf::Event event{};
@@ -129,11 +154,13 @@ int main() {
         cube.update();
         cube2.update();
         cube3.update();
+        cube4.update();
 
         window.clear();
         cube.draw(window);
         cube2.draw(window);
         cube3.draw(window);
+        cube4.draw(window);
         window.display();
     }
     return 0;
