@@ -5,13 +5,19 @@ constexpr float SCALE = 30.0f;
 
 class Cube {
 public:
-    Cube(b2World &world, float x, float y, bool dynamic = false) {
+    Cube(b2World &world, float x, float y, int dynamic = 0) {
         b2BodyDef bodydef;
         bodydef.position.Set(x / SCALE, y / SCALE);
-        if (dynamic==true) {
-            bodydef.type = b2_dynamicBody;
-        } else {
-            bodydef.type = b2_staticBody;
+        switch (dynamic) {
+            case 0:
+                bodydef.type = b2_staticBody;
+                break;
+            case 1:
+                bodydef.type = b2_dynamicBody;
+                break;
+            case 2:
+                bodydef.type = b2_kinematicBody;
+                break;
         }
         body = world.CreateBody(&bodydef);
 
@@ -55,41 +61,54 @@ private:
 };
 
 int main() {
-    sf::RenderWindow window(sf::VideoMode(1000, 900), "Space Invaders v0.0.1!");
+    sf::RenderWindow window(sf::VideoMode(1000, 1000), "Space Invaders v0.0.1!");
 
-    b2Vec2 gravity(0.0f, 4.0f);
+    b2Vec2 gravity(0.0f, 0.0f);
     b2World world(gravity);
 
-    Cube cube(world, 400, 300,true);
+    Cube cube(world, 400, 300,1);
 
-    Cube cube2(world, 500, 300, false);
+    Cube cube2(world, 500, 300, 1);
+
+    Cube cube3(world, 600, 400, 0);
 
     b2PrismaticJointDef jointDef;
-    jointDef.Initialize(cube.getBody(), cube2.getBody(), cube.getBody()->GetWorldCenter(), b2Vec2(1.0f, 0.0f));
+    jointDef.Initialize(cube.getBody(), cube3.getBody(), cube3.getBody()->GetWorldCenter(), b2Vec2(1.0f, 0.0f));
     jointDef.lowerTranslation = -10.0f;
     jointDef.upperTranslation = 10.0f;
     jointDef.enableLimit = true;
 
+    b2PrismaticJointDef jointDef2;
+    jointDef2.Initialize(cube2.getBody(), cube3.getBody(), cube3.getBody()->GetWorldCenter(), b2Vec2(0.0f, 1.0f));
+    jointDef2.lowerTranslation = -10.0f;
+    jointDef2.upperTranslation = 10.0f;
+    jointDef2.enableLimit = true;
+
 
     world.CreateJoint(&jointDef);
+    world.CreateJoint(&jointDef2);
 
     while (window.isOpen()) {
         sf::Event event{};
         while (window.pollEvent(event)) {
             if (sf::Keyboard::isKeyPressed(sf::Keyboard::D)) {
                 cube.getBody()->ApplyForceToCenter(b2Vec2(0.1f, 0.0f), true);
+                cube2.getBody()->ApplyForceToCenter(b2Vec2(0.1f, 0.0f), true);
             }
 
             if (sf::Keyboard::isKeyPressed(sf::Keyboard::A)) {
                 cube.getBody()->ApplyForceToCenter(b2Vec2(-0.1f, 0.0f), true);
+                cube2.getBody()->ApplyForceToCenter(b2Vec2(-0.1f, 0.0f), true);
             }
 
             if (sf::Keyboard::isKeyPressed(sf::Keyboard::W)) {
                 cube.getBody()->ApplyForceToCenter(b2Vec2(0.0f, -0.1f), true);
+                cube2.getBody()->ApplyForceToCenter(b2Vec2(0.0f, -0.1f), true);
             }
 
             if (sf::Keyboard::isKeyPressed(sf::Keyboard::S)) {
                 cube.getBody()->ApplyForceToCenter(b2Vec2(0.0f, 0.1f), true);
+                cube2.getBody()->ApplyForceToCenter(b2Vec2(0.0f, 0.1f), true);
             }
 
             if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space)) {
@@ -101,20 +120,20 @@ int main() {
                 cube2.stop();
             }
 
-            // The Z key event to close the window
             if (sf::Keyboard::isKeyPressed(sf::Keyboard::Z)) {
                 window.close();
-                return 0; // return from the main function, effectively ending the program
             }
         }
 
         world.Step(1 / 60.f, 8, 3);
         cube.update();
         cube2.update();
+        cube3.update();
 
         window.clear();
         cube.draw(window);
         cube2.draw(window);
+        cube3.draw(window);
         window.display();
     }
     return 0;
