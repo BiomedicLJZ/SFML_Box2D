@@ -113,6 +113,32 @@ int main() {
     world.CreateJoint(&gearJointDef);
 
 
+    //Pulley Joint
+
+    Cube myBody1(world, 600, 600, 1,1.0f);
+    Cube myBody2(world, 700, 600, 1,1.0f);
+
+    b2Vec2 anchor1 = myBody1.getBody()->GetWorldCenter();
+    b2Vec2 anchor2 = myBody2.getBody()->GetWorldCenter();
+
+    b2Vec2 p1= myBody1.getBody()->GetPosition();
+    b2Vec2 p2= myBody2.getBody()->GetPosition();
+
+    b2Vec2 groundAnchor1(p1.x, p1.y + 50.0f);
+    b2Vec2 groundAnchor2(p2.x, p2.y + 52.0f);
+
+    float ratio = 1.0f;
+
+    b2PulleyJointDef pulleyjointDef;
+    pulleyjointDef.Initialize(myBody1.getBody(), myBody2.getBody(), groundAnchor1, groundAnchor2, anchor1, anchor2, ratio);
+
+
+    world.CreateJoint(&pulleyjointDef);
+
+    myBody1.getBody()->ApplyForce(b2Vec2(0.0f, -0.1f), myBody1.getBody()->GetWorldCenter(), true);
+
+
+
     while (window.isOpen()) {
         sf::Event event{};
         while (window.pollEvent(event)) {
@@ -155,12 +181,16 @@ int main() {
         cube2.update();
         cube3.update();
         cube4.update();
+        myBody1.update();
+        myBody2.update();
 
         window.clear();
         cube.draw(window);
         cube2.draw(window);
         cube3.draw(window);
         cube4.draw(window);
+        myBody1.draw(window);
+        myBody2.draw(window);
         window.display();
     }
     return 0;
